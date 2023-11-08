@@ -105,21 +105,47 @@ def is_terminal_size_vaid():
     return rows >= 35 and columns >= 105
 
 
-def load_save(file_name=None):
+def load_save(file_name=None, from_cmd=False):
     if file_name is None:
         file_name = input("Podaj nazwę pliku z zapisem: ")
 
-    if not os.path.exists(file_name):
-        print(f"Plik {file_name} nie został znaleziony.")
-        exit(1)
+    while True:
+        if not file_name.endswith(".pkl"):
+            print(f"Nieodpowiedni plik. Wymagany plik z rozszerzeniem .pkl")
+            file_name = input(f"Podaj ponownie nazwę pliku lub wciśnij ENTER by wrócić do menu: ")
+            if file_name == '':
+                menu()
+                break
+            else:
+                continue
 
-    try:
-        with open(file_name, 'rb') as file:
-            board_save, config_save = pickle.load(file)
-            game(board_save=board_save, config_save=config_save)
-    except Exception as e:
-        print("Nie udało się załadować pliku")
-        exit(1)
+        if not os.path.exists(file_name):
+            print(f"Plik {file_name} nie został znaleziony.")
+            if from_cmd:
+                exit(1)
+            else:
+                file_name = input(f"Podaj ponownie nazwę pliku lub wciśnij ENTER by wrócić do menu: ")
+                if file_name == '':
+                    menu()
+                    break
+                else:
+                    continue
+
+        try:
+            with open(file_name, 'rb') as file:
+                board_save, config_save = pickle.load(file)
+                game(board_save=board_save, config_save=config_save)
+        except Exception as e:
+            print("Nie udało się załadować pliku")
+            if from_cmd:
+                exit(1)
+            else:
+                file_name = input(f"Podaj ponownie nazwę pliku lub wciśnij ENTER by wrócić do menu: ")
+                if file_name == '':
+                    menu()
+                    break
+                else:
+                    continue
 
 
 def clear_screen():
@@ -256,7 +282,7 @@ def show_help(script_name):
     print("         Argumenty podawane przy ustawianiu i strzelaniu muszą być oddzielone pojedynczą spacją.")
     print("         Z programu można wyjść po każdej turze gracza podejąc 'EXIT'. Skrypt pozwala też w tym momencie na")
     print("         zapis stanu gry. Domyślna nazwa zapisu to obecny czas poprzedzony prefixem save_. Można podać własną")
-    print("         nazwę. Aby wczytać zapis bezpośrednio po opcji 'save' należy podać plik z zapisem. Menu również")
+    print("         nazwę. Aby wczytać zapis bezpośrednio po opcji 'save' należy podać plik .pkl z zapisem. Menu również")
     print("         pozwala na wczytanie zapisu.")
     print("         Minimalny rozmiar konsoli to 105 kolumn i 35 wierszy")
     print()
@@ -291,7 +317,11 @@ if __name__ == "__main__":
                 save_index = sys.argv.index('-s' if '-s' in sys.argv else '--save')
                 if save_index + 1 < len(sys.argv):
                     save_file = sys.argv[save_index + 1]
-                    load_save(save_file)
+                    if save_file.endswith(".pkl"):
+                        load_save(save_file, True)
+                    else:
+                        print(f"Nieodpowiedni plik. Wymagany plik z rozszerzeniem .pkl")
+                        exit(1)
                 else:
                     print(f"Brak nazwy pliku po {sys.argv[save_index]}.")
                     exit(1)
