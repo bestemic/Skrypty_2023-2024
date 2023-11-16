@@ -7,9 +7,11 @@ SHIPS = {
     "N": (3, 'Niszczyciel'),
     "F": (2, 'Fregata'),
     "P": (2, 'Pancernik'),
+    "B": (2, 'Bismark'),
     "K": (1, 'Kuter'),
     "Z": (1, 'Zbiornikowiec'),
     "T": (1, 'Tralowiec'),
+    "M": (1, 'Motorówka'),
 }
 
 MISS = "miss"
