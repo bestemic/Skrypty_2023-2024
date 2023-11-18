@@ -39,7 +39,15 @@ show_no_files_error() {
     echo "Błąd: Nie podano żadnego pliku."
 }
 
-METHODS=("cat" "dog")
+show_file_not_found_error() {
+    echo "Błąd: Podany plik: '$1' nie istnieje."
+}
+
+show_no_lib_error () {
+    echo "Błąd: Nie znaleziono modułu: '$1' w katalogu ze skryptem."
+}
+
+METHODS=("cat" "dog" "cezar")
 
 num_args=$#
 operation=""
@@ -154,5 +162,22 @@ fi
 
 if [ ${#files[@]} -eq 0 ]; then
     show_no_files_error
+    exit 1
+fi
+
+for file in "${files[@]}"; do
+    if [ ! -f "$file" ]; then
+        show_file_not_found_error $file
+        exit 1
+    fi
+done
+
+lib_name="${method}_lib.sh"
+main_dir=$(dirname "$0")
+
+if [ -e "$main_dir/$lib_name" ]; then
+    source "$main_dir/$lib_name"
+else
+    show_no_lib_error $lib_name
     exit 1
 fi
