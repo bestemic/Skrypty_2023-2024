@@ -43,8 +43,12 @@ show_file_not_found_error() {
     echo "Błąd: Podany plik: '$1' nie istnieje."
 }
 
-show_no_lib_error () {
+show_no_lib_error() {
     echo "Błąd: Nie znaleziono modułu: '$1' w katalogu ze skryptem."
+}
+
+show_no_write_error() {
+    echo "Błąd: Brak uprawnień do zapisu w bieżącym folderze."
 }
 
 METHODS=("cat" "dog" "cezar")
@@ -165,6 +169,11 @@ if [ ${#files[@]} -eq 0 ]; then
     exit 1
 fi
 
+if ! [ -w "." ]; then
+    show_no_write_error
+    exit 1
+fi
+
 for file in "${files[@]}"; do
     if [ ! -f "$file" ]; then
         show_file_not_found_error $file
@@ -177,6 +186,22 @@ main_dir=$(dirname "$0")
 
 if [ -e "$main_dir/$lib_name" ]; then
     source "$main_dir/$lib_name"
+    verify_key $key
+
+    for file in "${files[@]}"; do
+        text=$(<"$file")
+
+        if [ "$operation" == "encrypt" ]; then
+            text=$(encrypt $text $key)
+        else
+            text=$(decode $text $key)
+        fi
+
+        target_file=$(basename -- "$file")
+        target_file="${target_file%.*}_encrypted.txt"
+
+        echo "$text" >"$target_file"
+    done
 else
     show_no_lib_error $lib_name
     exit 1
