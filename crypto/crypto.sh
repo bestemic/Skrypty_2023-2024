@@ -192,15 +192,15 @@ if [ -e "$main_dir/$lib_name" ]; then
         text=$(<"$file")
 
         if [ "$operation" == "encrypt" ]; then
-            text=$(encrypt $text $key)
+            text=$(encrypt "$text" $key)
         else
-            text=$(decode $text $key)
+            text=$(decode "$text" $key)
         fi
 
         target_file=$(basename -- "$file")
         target_file="${target_file%.*}_encrypted.txt"
 
-        echo "$text" >"$target_file"
+        echo -n "$text" >"$target_file"
     done
 else
     show_no_lib_error $lib_name
