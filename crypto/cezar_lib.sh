@@ -1,10 +1,12 @@
 #!/bin/bash
 
-alphabet="aąbcćdeęfghijklłmnńoóprsśtuwyzźż0123456789"
+alphabet_lowercase="aąbcćdeęfghijklłmnńoóprsśtuwyzźż0123456789"
+alphabet_uppercase="AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ0123456789"
+
 declare -A alphabet_dict
 
-for ((i = 0; i < ${#alphabet}; i++)); do
-  char="${alphabet:$i:1}"
+for ((i = 0; i < ${#alphabet_lowercase}; i++)); do
+  char="${alphabet_lowercase:$i:1}"
   alphabet_dict["$char"]=$((i))
 done
 
@@ -24,13 +26,25 @@ encrypt() {
 
   for ((i = 0; i < ${#text}; i++)); do
     char="${text:i:1}"
-    index="${alphabet_dict[$char]}"
 
-    if [ -n "$index" ]; then
-      new_index=$(((index + key) % 42))
-      result+="${alphabet:$new_index:1}"
-    else
+    if [[ $char =~ [[:space:]] ]]; then
       result+="$char"
+    else
+      lower_char=$(echo "$char" | awk '{print tolower($0)}')
+      index="${alphabet_dict[$lower_char]}"
+
+      if [ -n "$index" ]; then
+        new_index=$(((index + key) % 42))
+
+        if [[ "$char" =~ [A-ZĘÓĄŚŁŻŹĆŃ] ]]; then
+          result+="${alphabet_uppercase:$new_index:1}"
+        else
+          result+="${alphabet_lowercase:$new_index:1}"
+        fi
+
+      else
+        result+="$char"
+      fi
     fi
 
   done
