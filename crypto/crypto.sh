@@ -190,15 +190,17 @@ if [ -e "$main_dir/$lib_name" ]; then
 
     for file in "${files[@]}"; do
         text=$(<"$file")
+        target_file=$(basename -- "$file")
 
         if [ "$operation" == "encrypt" ]; then
             text=$(encrypt "$text" $key)
+            target_file="${target_file%.*}_encrypted.txt"
+
         else
             text=$(decode "$text" $key)
-        fi
+            target_file="${target_file%.*}_decoded.txt"
 
-        target_file=$(basename -- "$file")
-        target_file="${target_file%.*}_encrypted.txt"
+        fi
 
         echo -n "$text" >"$target_file"
     done
