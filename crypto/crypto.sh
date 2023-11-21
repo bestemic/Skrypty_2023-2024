@@ -1,16 +1,43 @@
 #!/bin/bash
 # Przemysław Pawlik PJS1
 
-# TODO
 show_help() {
-    echo "Help"
+    echo -e "Skrypt pozwalający na szyfrowanie i deszyfrowanie plików tekstowych przy użyciu prostych szyfrów podstawieniowych.\n"
+
+    echo "OPIS"
+    echo -e "\tSkrypt słyży do szyfrowania i deszyfrowania plików tekstowych z rozszrzeniem '.txt'. Aby przejrzeć dostępne algorytmy należy użyć opji -a lub --available.\n\
+    \tDo poprawnego działania wymagane jest podanie tryby pracy określającego czy chcemy podane pliki zakodować czy odkodować. Kolejnym wymaganym argumentem jest\n\
+    \tokreślenie metody szyfrującej poprzez flagę -m lub --method po których należy podać jedną z dostępnych metod. Do każdej z metod należy podać też klucz który\n\
+    \tzostanie użyty w trakcie przetwarzania plików. Aby tego dokonać należy po fladze -k lub --key podać odpowiedni klucz zgodnie z informacjami opisanymi na\n\
+    \tliście dostępnych metod. Skrypt umożliwia operację na kilku plikach jednocześnie. Każdy plik z rozszerzeniem '.txt' poprzedzony musi być przez opcję -f lub\n\
+    \t--file. Skrypt operuje tylko na tekstach składających się z alfabetu polskiego. Pliki zapisane zostaną w katalogu z którego wywołano skrypt, a ich nowa nazwa\n\
+    \tbędzie składać się z oryginalnej nazwy pliku i przyrostków: _encrypted dla plików zakodowanych oraz _decoded dla plików odkodowanych.\n"
+
+    echo "UŻYCIE"
+    echo -e "\t./$1 [OPCJE] [ARGUMENTY]\n"
+
+    echo "OPCJE"
+    echo -e "\t-h, --help\twyświtla pomoc"
+    echo -e "\t-a, --available\twyświtla dostępne metody szyfrowania wraz z opisami"
+    echo -e "\t-f, --file\twczytuje plik, należy go umieścić jako kolejny argument po fladze"
+    echo -e "\t-k, --key\tpobiera klucz używany do algorytmów, należy go umieścić jako kolejny argument po fladze"
+    echo -e "\t-m, --method\tpozwala na wybór algorytmu szyfrowania, należy umieścić nazwę szyfru jako kolejny argument po fladze, dostępna lista metod po użyciu\n\
+    \t\t\tflagi -a lub --available"
+    echo -e "\t-e, --encrypt\tustawia skrypt w trybie szyfrowania, sprzeczne z flagami -d oraz --decode"
+    echo -e "\t-d, --decode\tustawia skrypt w trybie deszyfrowania, sprzeczne z flagami -e oraz --encrypt\n"
+
+    echo "PRZYKŁADY"
+    echo -e "\t./$1 -d -m cezar -k 15 -f tajne.txt"
+    echo -e "\t./$1 -e -m vigenere -k tojestklucz -f tajne.txt -f przykład.txt"
 }
 
-# TODO
 show_available() {
     echo "Dostępne opcje:"
-    echo -e "cezar \t\t Szyfr Cezara to szyfr, w którym każda litera tekstu jawego jest zamieniana na literę przesuniętą o stałą liczbę miejsc w alfabecie."
-    echo -e "vigenere \t Szyfr Vigenere'a to szyfr, w którym każda litera tekstu jawego jest szyfrowana za pomocą przesunięcia wyznaczanego na podstawie elementów klucza."
+    echo -e "cezar \t\tSzyfr Cezara to szyfr, w którym każda litera tekstu jawego jest zamieniana na literę przesuniętą o stałą liczbę miejsc w alfabecie.\n\
+    \t\tKlucz powinien być liczbą naturalną z zakresu od 0 do 32."
+    echo -e "vigenere \tSzyfr Vigenere'a to szyfr, w którym każda litera tekstu jawego jest szyfrowana za pomocą przesunięcia wyznaczanego na podstawie elementów klucza.\n\
+    \t\tKlucz powinien być ciągiem liter alfabetu polskiego."
+
 }
 
 show_multiple_operation_error() {
@@ -63,7 +90,7 @@ files=()
 
 for arg in "$@"; do
     if [ "$arg" == "-h" ] || [ "$arg" == "--help" ]; then
-        show_help
+        show_help "$0"
         exit 0
     fi
 done
