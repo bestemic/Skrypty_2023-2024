@@ -8,7 +8,9 @@ show_help() {
 
 # TODO
 show_available() {
-    echo "Dostępne opcje"
+    echo "Dostępne opcje:"
+    echo -e "cezar \t\t Szyfr Cezara to szyfr, w którym każda litera tekstu jawego jest zamieniana na literę przesuniętą o stałą liczbę miejsc w alfabecie."
+    echo -e "vigenere \t Szyfr Vigenere'a to szyfr, w którym każda litera tekstu jawego jest szyfrowana za pomocą przesunięcia wyznaczanego na podstawie elementów klucza."
 }
 
 show_multiple_operation_error() {
@@ -51,7 +53,7 @@ show_no_write_error() {
     echo "Błąd: Brak uprawnień do zapisu w bieżącym folderze."
 }
 
-METHODS=("cat" "dog" "cezar")
+METHODS=("cezar" "vigenere")
 
 num_args=$#
 operation=""
