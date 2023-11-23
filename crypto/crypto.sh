@@ -5,13 +5,13 @@ show_help() {
     echo -e "Skrypt pozwalający na szyfrowanie i deszyfrowanie plików tekstowych przy użyciu prostych szyfrów podstawieniowych.\n"
 
     echo "OPIS"
-    echo -e "\tSkrypt słyży do szyfrowania i deszyfrowania plików tekstowych z rozszrzeniem '.txt'. Aby przejrzeć dostępne algorytmy należy użyć opji -a lub --available.\n\
-    \tDo poprawnego działania wymagane jest podanie tryby pracy określającego czy chcemy podane pliki zakodować czy odkodować. Kolejnym wymaganym argumentem jest\n\
-    \tokreślenie metody szyfrującej poprzez flagę -m lub --method po których należy podać jedną z dostępnych metod. Do każdej z metod należy podać też klucz który\n\
-    \tzostanie użyty w trakcie przetwarzania plików. Aby tego dokonać należy po fladze -k lub --key podać odpowiedni klucz zgodnie z informacjami opisanymi na\n\
-    \tliście dostępnych metod. Skrypt umożliwia operację na kilku plikach jednocześnie. Każdy plik z rozszerzeniem '.txt' poprzedzony musi być przez opcję -f lub\n\
-    \t--file. Skrypt operuje tylko na tekstach składających się z alfabetu polskiego. Pliki zapisane zostaną w katalogu z którego wywołano skrypt, a ich nowa nazwa\n\
-    \tbędzie składać się z oryginalnej nazwy pliku i przyrostków: _encrypted dla plików zakodowanych oraz _decoded dla plików odkodowanych.\n"
+    echo -e "\tSkrypt słyży do szyfrowania i deszyfrowania zawartości dowolnych plików tekstowych zakodowanych systemem UTF-8. Aby przejrzeć dostępne algorytmy należy użyć\n\
+    \topcji -a lub --available. Do poprawnego działania wymagane jest podanie tryby pracy określającego czy chcemy podane pliki zakodować czy odkodować. Kolejnym\n\
+    \twymaganym argumentem jest określenie metody szyfrującej poprzez flagę -m lub --method po których należy podać jedną z dostępnych metod. Do każdej z metod\n\
+    \tnależy podać też klucz który zostanie użyty w trakcie przetwarzania plików. Aby tego dokonać należy po fladze -k lub --key podać odpowiedni klucz zgodnie z\n\
+    \tinformacjami opisanymi na liście dostępnych metod. Skrypt umożliwia operację na kilku plikach jednocześnie. Każdy plik zakodowany w systemie UFT-8\n\
+    \tpoprzedzony musi być przez opcję -f lub --file. Pliki zapisane zostaną w katalogu z którego wywołano skrypt, a ich nowa nazwa będzie składać się\n\
+    \tz oryginalnej nazwy pliku i przyrostków: _encrypted dla plików zakodowanych oraz _decoded dla plików odkodowanych.\n"
 
     echo "UŻYCIE"
     echo -e "\t$0 [OPCJE] [ARGUMENTY]\n"
@@ -61,7 +61,7 @@ show_no_key_error() {
 }
 
 show_bad_file_error() {
-    echo "Błąd: Podany plik: '$1' nie posiada rozszerzenia '.txt'."
+    echo "Błąd: Podany plik: '$1' nie jest zakodowany w UTF-8."
 }
 
 show_no_files_error() {
@@ -165,13 +165,7 @@ for ((i = 0; i <= $num_args; i++)); do
 
         if [ $next -le $num_args ]; then
             file="${!next}"
-
-            if [[ $file == *.txt ]]; then
-                files+=(${!next})
-            else
-                show_bad_file_error $file
-                exit 1
-            fi
+            files+=(${!next})
         fi
         ((i += 1))
     fi
@@ -206,6 +200,13 @@ fi
 for file in "${files[@]}"; do
     if [ ! -f "$file" ]; then
         show_file_not_found_error $file
+        exit 1
+    fi
+
+    encoding=$(file --mime-encoding "$file")
+
+    if [[ ! "$encoding" =~ "utf-8" ]]; then
+        show_bad_file_error $file
         exit 1
     fi
 done
