@@ -14,7 +14,7 @@ show_help() {
     \tbędzie składać się z oryginalnej nazwy pliku i przyrostków: _encrypted dla plików zakodowanych oraz _decoded dla plików odkodowanych.\n"
 
     echo "UŻYCIE"
-    echo -e "\t./$1 [OPCJE] [ARGUMENTY]\n"
+    echo -e "\t$0 [OPCJE] [ARGUMENTY]\n"
 
     echo "OPCJE"
     echo -e "\t-h, --help\twyświtla pomoc"
@@ -27,8 +27,8 @@ show_help() {
     echo -e "\t-d, --decode\tustawia skrypt w trybie deszyfrowania, sprzeczne z flagami -e oraz --encrypt\n"
 
     echo "PRZYKŁADY"
-    echo -e "\t./$1 -d -m cezar -k 15 -f tajne.txt"
-    echo -e "\t./$1 -e -m vigenere -k tojestklucz -f tajne.txt -f przykład.txt"
+    echo -e "\t$0 -d -m cezar -k 15 -f tajne.txt"
+    echo -e "\t$0 -e -m vigenere -k tojestklucz -f tajne.txt -f przykład.txt"
 }
 
 show_available() {
@@ -218,7 +218,11 @@ if [ -e "$main_dir/$lib_name" ]; then
     verify_key $key
 
     for file in "${files[@]}"; do
-        text=$(<"$file")
+        text=$(
+            cat "$file"
+            printf x
+        )
+
         target_file=$(basename -- "$file")
 
         if [ "$operation" == "encrypt" ]; then
@@ -228,10 +232,11 @@ if [ -e "$main_dir/$lib_name" ]; then
         else
             text=$(decode "$text" $key)
             target_file="${target_file%.*}_decoded.txt"
-
         fi
 
+        text=${text%x}
         echo -n "$text" >"$target_file"
+
     done
 else
     show_no_lib_error $lib_name
