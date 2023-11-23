@@ -36,7 +36,7 @@ show_available() {
     echo -e "cezar \t\tSzyfr Cezara to szyfr, w którym każda litera tekstu jawego jest zamieniana na literę przesuniętą o stałą liczbę miejsc w alfabecie.\n\
     \t\tKlucz powinien być liczbą naturalną z zakresu od 0 do 32."
     echo -e "vigenere \tSzyfr Vigenere'a to szyfr, w którym każda litera tekstu jawego jest szyfrowana za pomocą przesunięcia wyznaczanego na podstawie elementów klucza.\n\
-    \t\tKlucz powinien być ciągiem liter alfabetu polskiego."
+    \t\tKlucz powinien zawierać co najmniej dwie litery."
 
 }
 
@@ -215,7 +215,7 @@ main_dir=$(dirname "$0")
 
 if [ -e "$main_dir/$lib_name" ]; then
     source "$main_dir/$lib_name"
-    verify_key $key
+    verify_key "$key"
 
     for file in "${files[@]}"; do
         text=$(
@@ -226,11 +226,11 @@ if [ -e "$main_dir/$lib_name" ]; then
         target_file=$(basename -- "$file")
 
         if [ "$operation" == "encrypt" ]; then
-            text=$(encrypt "$text" $key)
+            text=$(encrypt "$text" "$key")
             target_file="${target_file%.*}_encrypted.txt"
 
         else
-            text=$(decode "$text" $key)
+            text=$(decode "$text" "$key")
             target_file="${target_file%.*}_decoded.txt"
         fi
 

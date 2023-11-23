@@ -13,8 +13,8 @@ done
 verify_key() {
     local key=$1
 
-    if [[ ! $key =~ ^[$alphabet_lowercase$alphabet_uppercase]+$ ]]; then
-        echo "Błąd: Klucz powinien składać się tylko z liter alfabetu polskiego."
+    if [[ ! $key =~ [${alphabet_lowercase}${alphabet_uppercase}].*[${alphabet_lowercase}${alphabet_uppercase}] ]]; then
+        echo "Błąd: Klucz powinien zawierać co najmniej dwie litery."
         exit 1
     fi
 }
@@ -38,6 +38,12 @@ encrypt() {
 
             if [ -n "$index" ]; then
                 key_char="${key:((key_iterator % key_length)):1}"
+
+                while ! [[ "$key_char" =~ [${alphabet_lowercase}${alphabet_uppercase}] ]]; do
+                    ((key_iterator++))
+                    key_char="${key:((key_iterator % key_length)):1}"
+                done
+
                 key_index="${alphabet_dict[$key_char]}"
                 new_index=$(((index + key_index) % 32))
                 ((key_iterator++))
@@ -52,7 +58,6 @@ encrypt() {
                 result+="$char"
             fi
         fi
-
     done
 
     echo "$result"
@@ -67,17 +72,20 @@ decode() {
     for ((i = 0; i < ${#key}; i++)); do
         char="${key:i:1}"
 
-        lower_char=$(echo "$char" | awk '{print tolower($0)}')
-        index="${alphabet_dict[$lower_char]}"
-        new_index=$(((32 - index) % 32))
+        if [[ "$char" =~ [${alphabet_lowercase}${alphabet_uppercase}] ]]; then
+            lower_char=$(echo "$char" | awk '{print tolower($0)}')
+            index="${alphabet_dict[$lower_char]}"
+            new_index=$(((32 - index) % 32))
 
-        if [[ "$char" =~ [A-ZĘÓĄŚŁŻŹĆŃ] ]]; then
-            reversed_key+="${alphabet_uppercase:$new_index:1}"
+            if [[ "$char" =~ [A-ZĘÓĄŚŁŻŹĆŃ] ]]; then
+                reversed_key+="${alphabet_uppercase:$new_index:1}"
+            else
+                reversed_key+="${alphabet_lowercase:$new_index:1}"
+            fi
         else
-            reversed_key+="${alphabet_lowercase:$new_index:1}"
+            reversed_key+="${char}"
         fi
-
     done
 
-    echo "$(encrypt "$text" $reversed_key)"
+    echo "$(encrypt "$text" "$reversed_key")"
 }
