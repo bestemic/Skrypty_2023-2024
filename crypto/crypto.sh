@@ -10,8 +10,9 @@ show_help() {
     \twymaganym argumentem jest określenie metody szyfrującej poprzez flagę -m lub --method po których należy podać jedną z dostępnych metod. Do każdej z metod\n\
     \tnależy podać też klucz który zostanie użyty w trakcie przetwarzania plików. Aby tego dokonać należy po fladze -k lub --key podać odpowiedni klucz zgodnie z\n\
     \tinformacjami opisanymi na liście dostępnych metod. Skrypt umożliwia operację na kilku plikach jednocześnie. Każdy plik zakodowany w systemie UFT-8\n\
-    \tpoprzedzony musi być przez opcję -f lub --file. Pliki zapisane zostaną w katalogu z którego wywołano skrypt, a ich nowa nazwa będzie składać się\n\
-    \tz oryginalnej nazwy pliku i przyrostków: _encrypted dla plików zakodowanych oraz _decoded dla plików odkodowanych.\n"
+    \tpoprzedzony musi być przez opcję -f lub --file. Pliki zapisane zostaną w katalogu z którego wywołano skrypt, a ich domyślna nowa nazwa będzie składać się\n\
+    \tz oryginalnej nazwy pliku i przyrostków: _encrypted dla plików zakodowanych oraz _decoded dla plików odkodowanych. Używająć flagi -o lub --out można podać\n\
+    \tnowe nazwy plików wynikowych. W przypadku podania mniejszej liczby nazw wynikowych niż plików, pozostałe pliki zostaną zapisane z nazwą domyślną.\n"
 
     echo "UŻYCIE"
     echo -e "\t$0 [OPCJE] [ARGUMENTY]\n"
@@ -24,11 +25,12 @@ show_help() {
     echo -e "\t-m, --method\tpozwala na wybór algorytmu szyfrowania, należy umieścić nazwę szyfru jako kolejny argument po fladze, dostępna lista metod po użyciu\n\
     \t\t\tflagi -a lub --available"
     echo -e "\t-e, --encrypt\tustawia skrypt w trybie szyfrowania, sprzeczne z flagami -d oraz --decode"
-    echo -e "\t-d, --decode\tustawia skrypt w trybie deszyfrowania, sprzeczne z flagami -e oraz --encrypt\n"
+    echo -e "\t-d, --decode\tustawia skrypt w trybie deszyfrowania, sprzeczne z flagami -e oraz --encrypt"
+    echo -e "\t-o, --out\tpobiera opcjonalną nazwę pliku wynikowego, należy go umieścić jako kolejny argument po fladze\n"
 
     echo "PRZYKŁADY"
     echo -e "\t$0 -d -m cezar -k 15 -f tajne.txt"
-    echo -e "\t$0 -e -m vigenere -k tojestklucz -f tajne.txt -f przykład.txt"
+    echo -e "\t$0 -e -m vigenere -k tojestklucz -f tajne.txt -f przykład.txt -o output.txt"
 }
 
 show_available() {
@@ -37,7 +39,6 @@ show_available() {
     \t\tKlucz powinien być liczbą naturalną z zakresu od 0 do 32."
     echo -e "vigenere \tSzyfr Vigenere'a to szyfr, w którym każda litera tekstu jawego jest szyfrowana za pomocą przesunięcia wyznaczanego na podstawie elementów klucza.\n\
     \t\tKlucz powinien zawierać co najmniej dwie litery."
-
 }
 
 show_multiple_operation_error() {
@@ -87,6 +88,7 @@ operation=""
 method=""
 key=""
 files=()
+outputs=()
 
 for arg in "$@"; do
     if [ "$arg" == "-h" ] || [ "$arg" == "--help" ]; then
@@ -164,8 +166,16 @@ for ((i = 0; i <= $num_args; i++)); do
         next=$(($i + 1))
 
         if [ $next -le $num_args ]; then
-            file="${!next}"
             files+=(${!next})
+        fi
+        ((i += 1))
+    fi
+
+    if [ "$arg" == "-o" ] || [ "$arg" == "--out" ]; then
+        next=$(($i + 1))
+
+        if [ $next -le $num_args ]; then
+            outputs+=(${!next})
         fi
         ((i += 1))
     fi
@@ -213,6 +223,7 @@ done
 
 lib_name="${method}_lib.sh"
 main_dir=$(dirname "$0")
+out_iterator=0
 
 if [ -e "$main_dir/$lib_name" ]; then
     source "$main_dir/$lib_name"
@@ -236,6 +247,12 @@ if [ -e "$main_dir/$lib_name" ]; then
         fi
 
         text=${text%x}
+
+        if [ "$out_iterator" -lt "${#outputs[@]}" ]; then
+            target_file="${outputs[out_iterator]}"
+            ((out_iterator++))
+        fi
+
         echo -n "$text" >"$target_file"
 
     done
