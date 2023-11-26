@@ -1,6 +1,16 @@
 #!/bin/bash
 # Przemysław Pawlik PJS1
 
+METHODS=("cezar" "vigenere")
+
+show_available() {
+    echo "Dostępne opcje:"
+    echo -e "cezar \t\tSzyfr Cezara to szyfr, w którym każda litera tekstu jawego jest zamieniana na literę przesuniętą o stałą liczbę miejsc w alfabecie.\n\
+    \t\tKlucz powinien być liczbą naturalną z zakresu od 0 do 32."
+    echo -e "vigenere \tSzyfr Vigenere'a to szyfr, w którym każda litera tekstu jawego jest szyfrowana za pomocą przesunięcia wyznaczanego na podstawie elementów klucza.\n\
+    \t\tKlucz powinien zawierać co najmniej dwie litery."
+}
+
 show_help() {
     echo -e "Skrypt pozwalający na szyfrowanie i deszyfrowanie plików tekstowych przy użyciu prostych szyfrów podstawieniowych.\n"
 
@@ -31,14 +41,32 @@ show_help() {
     echo "PRZYKŁADY"
     echo -e "\t$0 -d -m cezar -k 15 -f tajne.txt"
     echo -e "\t$0 -e -m vigenere -k tojestklucz -f tajne.txt -f przykład.txt -o output.txt"
-}
 
-show_available() {
-    echo "Dostępne opcje:"
-    echo -e "cezar \t\tSzyfr Cezara to szyfr, w którym każda litera tekstu jawego jest zamieniana na literę przesuniętą o stałą liczbę miejsc w alfabecie.\n\
-    \t\tKlucz powinien być liczbą naturalną z zakresu od 0 do 32."
-    echo -e "vigenere \tSzyfr Vigenere'a to szyfr, w którym każda litera tekstu jawego jest szyfrowana za pomocą przesunięcia wyznaczanego na podstawie elementów klucza.\n\
-    \t\tKlucz powinien zawierać co najmniej dwie litery."
+    echo "ROZSZERZALNOŚĆ"
+    echo -e "\tSkrypt w łatwy sposób możemy rozszerzać poprzez dodawanie nowych metod szyfrowania i deszyfrowania w modułach. Każdy nowy moduł musi mieć nazwę \n\
+    \tzłożona z nazwy dodanej metody oraz przyrostka _lib.sh np. METODA_lib.sh. Każdy moduł powinien zajmować się tylko przeprowadzaniem logiki danej operacji,\n\
+    \todczytywanie i zapisywanie do pliku jest zrealizowane w głównym programie. Tworząć nowy moduł należy zaimplementować trzy funkcje:\n\n\
+    \tverify_key() {\n\
+	\tlocal key=\$1\n\
+    \t\t# sprawdzanie poprawności klucza, należy wypisać błąd i wyjść z kodem błędu 1\n\
+    \t}\n\n\
+    \tencrypt() {\n\
+	\tlocal text=\$1\n\
+	\tlocal key=\$2\n\
+	\tlocal result=\"\"\n\
+    \t\t# logika szyfrowania, szyfrogram należy zapisać do zmiennej result\n\
+    \t\techo \"\$result\"\n\
+    \t}\n\n\
+    \tdecode() {\n\
+	\tlocal text=\$1\n\
+	\tlocal key=\$2\n\
+	\tlocal result=\"\"\n\
+    \t\t# logika deszyfracji, tekst jawny należy zapisać do zmiennej result\n\
+    \t\techo \"\$result\"\n\
+    \t}\n\
+    
+    \tDo pełnego działania skryptu trzeba dodać nową metodę do listy METHODS umieszczonej na początku pliku crypto.sh oraz dopisać informacje o metodzie w \n\
+    \tfunkcji show_available umieszczonej poniżej zmiennej METHODS."
 }
 
 show_multiple_operation_error() {
@@ -80,8 +108,6 @@ show_no_lib_error() {
 show_no_write_error() {
     echo "Błąd: Brak uprawnień do zapisu w bieżącym folderze."
 }
-
-METHODS=("cezar" "vigenere")
 
 num_args=$#
 operation=""
