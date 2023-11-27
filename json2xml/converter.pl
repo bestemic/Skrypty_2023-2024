@@ -40,12 +40,20 @@ if (-e $filename) {
     exit 1;
 }
 
+eval { 
+    require Logic 
+};
+
+if ($@) {
+    print "Błąd: Nie znaleziono modułu logic.pm w katalogu ze skryptem.\n";
+}
+
 if ($validate) {
-    validate();
+    Logic::validate();
     exit 0;
 } else {
-    validate();
-    convert();
+    Logic::validate();
+    Logic::convert();
 }
 
 sub show_help {
@@ -73,12 +81,4 @@ sub show_help {
     print "PRZYKŁADY\n";
     print "\t$0 -v plik.json\n";
     print "\t$0 -o wynik.xml plik.json\n";
-}
-
-sub validate {
-    print "Wywołano funkcję walidacji.\n";
-}
-
-sub convert {
-    print "Wywołano funkcję konwersji.\n";
 }
