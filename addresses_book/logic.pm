@@ -29,5 +29,96 @@ sub load_contacts {
     }
     close $data;
 
-    return sort { $a->{name} cmp $b->{name} } @contacts;
+    return sort { lc($a->{name}) cmp lc($b->{name}) } @contacts;
+}
+
+sub save_contacts {
+    my @contacts = @_;
+    @contacts = sort { lc($a->{name}) cmp lc($b->{name}) } @contacts;
+
+    open(my $file, '>', $file_path) or die "Błąd: Nie udało się otworzyć pliku $file_path."; 
+    for my $contact (@contacts) {
+        print $file "$contact->{name}|$contact->{phone}|$contact->{email}\n";
+    }
+    close $file;
+}
+
+sub add_contact {
+    my $contact_info = @_[0];
+    my @contact_infos = split(/\|/, $contact_info); 
+    my @new_contacts;
+
+    my $name = '';
+    my $phone = '';
+    my $email = '';
+    
+    for my $i (0 .. $#contact_infos) {
+        if ($i % 3 == 0) {
+            $name = $contact_infos[$i];
+        }
+        if ($i % 3 == 1) {
+            $phone = $contact_infos[$i];
+        }
+        if ($i % 3 == 2) {
+            $email = $contact_infos[$i];
+
+            if ($name ne '' || $phone ne '' || $email ne '') {
+                validate_contact_data($name, $phone, $email);
+                push @new_contacts, {
+                    name    => $name,
+                    phone   => $phone,
+                    email   => $email,
+                };
+                $name = '';
+                $phone = '';
+                $email = '';
+            }
+        }
+    }
+    if ($name ne '' || $phone ne '' || $email ne '') {
+        validate_contact_data($name, $phone, $email);
+        push @new_contacts, {
+            name    => $name,
+            phone   => $phone,
+            email   => $email,
+        };
+    }
+
+    @saved_contacts = load_contacts();
+
+    foreach my $new_contact (@new_contacts) {
+        my $name_exists = grep { $_->{name} eq $new_contact->{name} } @saved_contacts;
+        if ($name_exists) {
+            print "Błąd: Kontakt o nazwie '$new_contact->{name}' już istnieje.\n";
+            exit 1;
+        } else {
+            push @saved_contacts, $new_contact;
+        }
+    }
+
+    save_contacts(@saved_contacts);
+}
+
+sub validate_contact_data {
+    if (@_[0] eq '') {
+        print "Błąd: Nazwa kontaktu jest wymagana.\n";
+        exit 1;
+    }
+    if (@_[1] eq '' && @_[2] eq '') {
+        print "Błąd: Wymagane jest podanie minimum jednej formy kontaktu (telefon, email).\n";
+        exit 1;
+    }
+
+    if (@_[1] ne '') {  
+        if ($_[1] !~ /^\d{9}$/) {
+            print "Błąd: Nieprawidłowy numer telefonu. Numer powinien składać się z 9 cyfr.\n";
+            exit 1;
+        }
+    }
+    if (@_[2] ne '') {
+        if ($_[2] !~ /^[^\s@]+@[^\s@]+\.[^\s@]+$/) {
+            print "Błąd: Nieprawidłowy adres email.\n";
+            exit 1;
+        }
+    }
 }

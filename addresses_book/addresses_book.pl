@@ -25,10 +25,13 @@ if ($@) {
 }
 
 Logic::create_database();
-my @contacts = Logic::load_contacts();
+# my @contacts = Logic::load_contacts();
 
-use Data::Dumper;
-print Dumper(@contacts);
+my $contact_info = "ola|123456789|a\@a.com|marcin|987654321||grześ||grzes\@gmail.com|maja|543216789";
+Logic::add_contact($contact_info);
+
+# use Data::Dumper;
+# print Dumper(@contacts);
 
 
 sub show_help {
