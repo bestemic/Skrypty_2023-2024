@@ -8,8 +8,6 @@ use Cwd qw( abs_path );
 use File::Basename qw( dirname );
 use lib dirname(abs_path($0));
 
-my $validate = 0;
-
 for my $arg (@ARGV) {
     if ($arg eq '-h' || $arg eq '--help') {
         show_help();
@@ -17,26 +15,30 @@ for my $arg (@ARGV) {
     }
 }
 
-for my $arg (@ARGV) {
-    if ($arg eq '-v' || $arg eq '--validate') {
-        $validate = 1;
-    }   
-}
-
 if (@ARGV == 0) {
     print "Błąd: Podaj plik jako ostatni argument.\n";
     exit 1;
 }
 
-my $filename = pop @ARGV;
+my $file_name = pop @ARGV;
 
-if (-e $filename) {
-    my $mime = qx{file --mime-type  "$filename"};
+if (-e $file_name) {
+    my $mime = qx{file --mime-type  "$file_name"};
     if (!($mime && $mime =~ /application\/json/) ){
-        print "Błąd: Plik nie posiada MIME application/json.\n"
+        print "Błąd: Plik nie posiada MIME application/json lub jego zawartość jest niezgodna z tym typem.\n";
+        exit 1;
     }
 } else {
-    print "Plik '$filename' nie istnieje.\n";
+    print "Plik '$file_name' nie istnieje.\n";
+    exit 1;
+}
+
+eval { 
+    require JSON::MaybeXS;
+};
+
+if ($@) {
+    print "Błąd: Nie znaleziono wymaganego modułu JSON. Należy go zainstalować.\n";
     exit 1;
 }
 
@@ -46,15 +48,22 @@ eval {
 
 if ($@) {
     print "Błąd: Nie znaleziono modułu logic.pm w katalogu ze skryptem.\n";
+    exit 1;
 }
 
-if ($validate) {
-    Logic::validate();
-    exit 0;
-} else {
-    Logic::validate();
-    Logic::convert();
+my $json_data = Logic::load_json_file($file_name);
+
+my $decoded_data;
+eval { 
+    $decoded_data = JSON::MaybeXS::decode_json($json_data);
+};
+
+if ($@) {
+    print "Błąd: Niepoprawny JSON, nie udało się wczytać. $@\n";
+    exit 1;
 }
+
+Logic::convert($decoded_data);
 
 sub show_help {
     print "Konwersja plików JSON do plików XML.\n\n";
