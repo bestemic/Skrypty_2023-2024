@@ -99,6 +99,27 @@ sub add_contact {
     save_contacts(@saved_contacts);
 }
 
+sub remove_contact {
+    my $contact_name = $_[0];
+    my @saved_contacts = load_contacts();
+
+    my $contact_found = 0;
+
+    for my $contact (@saved_contacts) {
+        if ($contact->{name} eq $contact_name) {
+            $contact_found = 1;
+            last;
+        }
+    }
+
+    if ($contact_found) {
+        @saved_contacts = grep { $_->{name} ne $contact_name } @saved_contacts;
+        save_contacts(@saved_contacts);
+    } else {
+        print "Błąd: Kontakt '$contact_name' nie został znaleziony.\n";
+    }
+}
+
 sub validate_contact_data {
     if (@_[0] eq '') {
         print "Błąd: Nazwa kontaktu jest wymagana.\n";
