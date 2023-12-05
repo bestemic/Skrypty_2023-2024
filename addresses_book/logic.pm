@@ -127,8 +127,11 @@ sub listAll {
     my @saved_contacts = load_contacts();
 
     if ($max_contacts < @saved_contacts) {
-        if ($max_contacts && $max_contacts =~ /^\d+$/) {
+        if ($max_contacts && $max_contacts =~ /^\d+$/ && $max_contacts > 0) {
             @saved_contacts = @saved_contacts[0 .. $max_contacts - 1];
+        } else {
+            print "Błąd: Podana liczba kontaktów musi być liczbą większą od zera.\n";
+            exit 1;
         }
     }
 
@@ -177,7 +180,6 @@ sub validate_contact_data {
         print "Błąd: Wymagane jest podanie minimum jednej formy kontaktu (telefon, email).\n";
         exit 1;
     }
-
     if (@_[1] ne '') {  
         if ($_[1] !~ /^\d{9}$/) {
             print "Błąd: Nieprawidłowy numer telefonu. Numer powinien składać się z 9 cyfr.\n";
