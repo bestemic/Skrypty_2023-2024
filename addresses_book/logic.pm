@@ -3,6 +3,8 @@ package Logic;
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(create_database, load_contacts);
+use utf8;
+use open qw(:std :utf8);
 
 my ($script_dir) = $0 =~ /^(.*)[\/\\]/;
 my $file_path = $script_dir . "/data.txt";
@@ -117,6 +119,31 @@ sub remove_contact {
         save_contacts(@saved_contacts);
     } else {
         print "Błąd: Kontakt '$contact_name' nie został znaleziony.\n";
+    }
+}
+
+sub listAll {
+    my $max_contacts = $_[0];
+    my @saved_contacts = load_contacts();
+
+    if ($max_contacts < @saved_contacts) {
+        if ($max_contacts && $max_contacts =~ /^\d+$/) {
+            @saved_contacts = @saved_contacts[0 .. $max_contacts - 1];
+        }
+    }
+
+    if (@saved_contacts) {
+        print "+--------------------------------+-----------+--------------------------------+\n";
+        printf "| %-30s | %-9s | %-30s |\n", 'Nazwa', 'Telefon', 'Email';
+        print "+--------------------------------+-----------+--------------------------------+\n";
+
+        for my $contact (@saved_contacts) {
+            printf "| %-30s | %-9s | %-30s |\n", $contact->{name}, $contact->{phone}, $contact->{email};
+        }
+
+        print "+--------------------------------+-----------+--------------------------------+\n";
+    } else {
+        print "Nie znaleziono kontaktów.\n";
     }
 }
 
