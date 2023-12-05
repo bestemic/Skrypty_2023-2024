@@ -2,7 +2,7 @@ package Logic;
 
 use Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(create_database, load_contacts);
+our @EXPORT = qw(create_database, load_contacts, save_contacts, add_contact, remove_contact, listOne);
 use utf8;
 use open qw(:std :utf8);
 

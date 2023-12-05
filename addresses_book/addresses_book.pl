@@ -23,7 +23,7 @@ eval {
 };
 
 if ($@) {
-    print "Błąd: Nie znaleziono modułu logic.pm w katalogu ze skryptem.$@\n";
+    print "Błąd: Nie znaleziono modułu logic.pm w katalogu ze skryptem.\n";
     exit 1;
 }
 
