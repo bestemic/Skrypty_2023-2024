@@ -1,5 +1,0 @@
-SkocznySmok|555123456|skoczny.smok@email.com
-BłyskawicznyNinja|555987654|ninja.blysk@email.com
-MagicznyMistrz|555111222|mistrz.magiczny@email.com
-SzybkiŻeglarz|555444333|zeglarz.szybki@email.com
-SpiewającyWróbel|555666777|wrobel.spiewajacy@email.com

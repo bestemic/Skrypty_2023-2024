@@ -126,8 +126,8 @@ sub listAll {
     my $max_contacts = $_[0];
     my @saved_contacts = load_contacts();
 
-    if ($max_contacts < @saved_contacts) {
-        if ($max_contacts && $max_contacts =~ /^\d+$/ && $max_contacts > 0) {
+    if ($max_contacts ne "" && $max_contacts < @saved_contacts) {
+        if ($max_contacts =~ /^\d+$/ && $max_contacts > 0) {
             @saved_contacts = @saved_contacts[0 .. $max_contacts - 1];
         } else {
             print "Błąd: Podana liczba kontaktów musi być liczbą większą od zera.\n";
