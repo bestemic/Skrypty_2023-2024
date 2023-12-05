@@ -147,6 +147,27 @@ sub listAll {
     }
 }
 
+sub listOne {
+    my $contact_name = $_[0];
+    my @saved_contacts = load_contacts();
+
+    my $contact_found = 0;
+
+    for my $contact (@saved_contacts) {
+        if ($contact->{name} eq $contact_name) {
+            print "Nazwa: $contact->{name}\n";
+            print "Telefon: $contact->{phone}\n" if $contact->{phone};
+            print "Email: $contact->{email}\n" if $contact->{email};
+            $contact_found = 1;
+            last;
+        }
+    }
+
+    if (! $contact_found) {
+        print "Błąd: Kontakt '$contact_name' nie został znaleziony.\n";
+    }
+}
+
 sub validate_contact_data {
     if (@_[0] eq '') {
         print "Błąd: Nazwa kontaktu jest wymagana.\n";
