@@ -101,6 +101,22 @@ if (@ARGV >= 1) {
                 exit 1;
             }
         }
+    } elsif ($mode eq "-p" || $mode eq "--pattern") {
+        $working_mode="pattern";
+        if (@ARGV >= 2 && $ARGV[1] ne "-f" && $ARGV[1] ne "--file") {
+            $argument = decode_utf8($ARGV[1]);
+            if (@ARGV >= 3 && ($ARGV[1] eq "-f" || $ARGV[1] ne "--file")) {
+                if (@ARGV >= 4 && $ARGV[3] ne "") {
+                    $file_name = decode_utf8($ARGV[3]);
+                } else {
+                    print "Błąd: Brak nazwy pliku z danymi.\n";
+                    exit 1;
+                }
+            }
+        } else {
+            print "Błąd: Brak patternu do wyszukania.\n";
+            exit 1;
+        }
     } elsif ($mode eq "-f" || $mode eq "--file") {
         if (@ARGV >= 2 && $ARGV[1] ne "") {
             $file_name = decode_utf8($ARGV[1]);
@@ -121,9 +137,11 @@ if ($working_mode eq "add") {
 } elsif ($working_mode eq "remove") {
     Logic::remove_contact($argument);
 } elsif ($working_mode eq "search") {
-    Logic::listOne($argument);
+    Logic::list_one($argument);
+} elsif ($working_mode eq "pattern") {
+    Logic::find_contacts($argument);
 } else {
-    Logic::listAll($argument);
+    Logic::list_all($argument);
 } 
 
 sub show_help {
@@ -151,6 +169,7 @@ sub show_help {
     print "\t-s, --search\tWyświtla podany kontakt, przyjemuje jeden wymagany argument - jednoczłonową nazwę kontaktu do wyświetlenia\n";
     print "\t-l, --list\tWyświetla listę kontaktów, przyjmuje jeden opcjonalny argument - liczbę kontaktów do wyświetlanie, domyślnie pokazuje wszystkie kontakty\n";
     print "\t-r, --remove\tUsuwa podany kontakt, przyjemuje jeden wymagany argument - jednoczłonową nazwę kontaktu do usunięcia\n";
+    print "\t-p, --pattern\t\n";
     print "\n";
 
     print "FLAGI\n";
@@ -163,4 +182,5 @@ sub show_help {
     print"\t$0 -l 2 -f nowa_baza.txt\n";
     print"\t$0 -s Jan\n";
     print"\t$0 -r Jan -f nowa_baza.txt\n";
+    print"\t$0 -p \"Lewa\"\n";
 }

@@ -2,7 +2,7 @@ package Logic;
 
 use Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(create_database, load_contacts, save_contacts, add_contact, remove_contact, listOne);
+our @EXPORT = qw(create_database, load_contacts, save_contacts, add_contact, remove_contact, list_one, find_contacts);
 use utf8;
 use open qw(:std :utf8);
 
@@ -137,7 +137,7 @@ sub remove_contact {
     }
 }
 
-sub listAll {
+sub list_all {
     my $max_contacts = $_[0];
     my @saved_contacts = load_contacts();
 
@@ -165,7 +165,7 @@ sub listAll {
     }
 }
 
-sub listOne {
+sub list_one {
     my $contact_name = $_[0];
     my @saved_contacts = load_contacts();
 
@@ -184,6 +184,38 @@ sub listOne {
 
     if (! $contact_found) {
         print "Błąd: Kontakt '$contact_name' nie został znaleziony.\n";
+    }
+}
+
+sub find_contacts {
+    my $pattern = $_[0];
+    my @saved_contacts = load_contacts();
+    my @found_contacts;
+
+    for my $contact (@saved_contacts) {
+        if ($contact->{name} eq $pattern || $contact->{description} =~ /\Q$pattern\E/) {
+            push @found_contacts, $contact;
+        }
+    }
+    
+    if (@found_contacts == 1) {
+        my $contact = $found_contacts[0];
+        print "Nazwa: $contact->{name}\n";
+        print "Opis: $contact->{description}\n" if $contact->{description};
+        print "Telefon: $contact->{phone}\n" if $contact->{phone};
+        print "Email: $contact->{email}\n" if $contact->{email};
+    } elsif (@found_contacts > 1) {
+        print "+--------------------------------+----------------------------------------------------+--------------+--------------------------------+\n";
+        printf "| %-30s | %-50s | %-12s | %-30s |\n", 'Nazwa', 'Opis', 'Telefon', 'Email';
+        print "+--------------------------------+----------------------------------------------------+--------------+--------------------------------+\n";
+
+        for my $contact (@found_contacts) {
+            printf "| %-30s | %-50s | %-12s | %-30s |\n", $contact->{name}, $contact->{description}, $contact->{phone}, $contact->{email};
+        }
+
+        print "+--------------------------------+----------------------------------------------------+--------------+--------------------------------+\n";
+    } else {
+        print "Nie znaleziono pasujących kontaktów.\n";
     }
 }
 
