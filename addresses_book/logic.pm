@@ -71,6 +71,7 @@ sub add_contact {
         }
         if ($i % 4 == 2) {
             $phone = $contact_infos[$i];
+            $phone =~ s/^\s+|\s+$//g;
         }
         if ($i % 4 == 3) {
             $email = $contact_infos[$i];
@@ -150,16 +151,16 @@ sub listAll {
     }
 
     if (@saved_contacts) {
-        print "+--------------------------------+----------------------------------------------------+-----------+--------------------------------+\n";
-        printf "| %-30s | %-50s | %-9s | %-30s |\n", 'Nazwa', 'Opis', 'Telefon', 'Email';
-        print "+--------------------------------+----------------------------------------------------+-----------+--------------------------------+\n";
+        print "+--------------------------------+----------------------------------------------------+--------------+--------------------------------+\n";
+        printf "| %-30s | %-50s | %-12s | %-30s |\n", 'Nazwa', 'Opis', 'Telefon', 'Email';
+        print "+--------------------------------+----------------------------------------------------+--------------+--------------------------------+\n";
 
         for my $contact (@saved_contacts) {
-            printf "| %-30s | %-50s | %-9s | %-30s |\n", $contact->{name}, $contact->{description}, $contact->{phone}, $contact->{email};
+            printf "| %-30s | %-50s | %-12s | %-30s |\n", $contact->{name}, $contact->{description}, $contact->{phone}, $contact->{email};
         }
 
-        print "+--------------------------------+----------------------------------------------------+-----------+--------------------------------+\n";
-        } else {
+        print "+--------------------------------+----------------------------------------------------+--------------+--------------------------------+\n";
+    } else {
         print "Nie znaleziono kontaktów.\n";
     }
 }
@@ -201,8 +202,11 @@ sub validate_contact_data {
         exit 1;
     }
     if (@_[1] ne '') {  
-        if ($_[1] !~ /^\d{9}$/) {
-            print "Błąd: Nieprawidłowy numer telefonu. Numer powinien składać się z 9 cyfr.\n";
+        my $phone_number = $_[1];
+        $phone_number =~ s/\s//g;
+
+        if ($phone_number !~ /^\d{9}$/) {
+            print "Błąd: Nieprawidłowy numer telefonu. Numer powinien składać się z 9 cyfr, z opcjonalnymi spacjami między nimi.\n";
             exit 1;
         }
     }
