@@ -30,6 +30,7 @@ if ($@) {
 my $file_name;
 my $working_mode="list";
 my $argument;
+my $data;
 
 if (@ARGV >= 1) {
     my $mode = $ARGV[0];
@@ -37,7 +38,7 @@ if (@ARGV >= 1) {
         $working_mode="add";
         if (@ARGV >= 2 && $ARGV[1] ne "-f" && $ARGV[1] ne "--file") {
             $argument = decode_utf8($ARGV[1]);
-            if (@ARGV >= 3 && ($ARGV[1] eq "-f" || $ARGV[1] ne "--file")) {
+            if (@ARGV >= 3 && ($ARGV[2] eq "-f" || $ARGV[2] eq "--file")) {
                 if (@ARGV >= 4 && $ARGV[3] ne "") {
                     $file_name = decode_utf8($ARGV[3]);
                 } else {
@@ -53,7 +54,7 @@ if (@ARGV >= 1) {
         $working_mode="remove";
         if (@ARGV >= 2 && $ARGV[1] ne "-f" && $ARGV[1] ne "--file") {
             $argument = decode_utf8($ARGV[1]);
-            if (@ARGV >= 3 && ($ARGV[1] eq "-f" || $ARGV[1] ne "--file")) {
+            if (@ARGV >= 3 && ($ARGV[2] eq "-f" || $ARGV[2] eq "--file")) {
                 if (@ARGV >= 4 && $ARGV[3] ne "") {
                     $file_name = decode_utf8($ARGV[3]);
                 } else {
@@ -69,7 +70,7 @@ if (@ARGV >= 1) {
         $working_mode="search";
         if (@ARGV >= 2 && $ARGV[1] ne "-f" && $ARGV[1] ne "--file") {
             $argument = decode_utf8($ARGV[1]);
-            if (@ARGV >= 3 && ($ARGV[1] eq "-f" || $ARGV[1] ne "--file")) {
+            if (@ARGV >= 3 && ($ARGV[2] eq "-f" || $ARGV[2] eq "--file")) {
                 if (@ARGV >= 4 && $ARGV[3] ne "") {
                     $file_name = decode_utf8($ARGV[3]);
                 } else {
@@ -85,7 +86,7 @@ if (@ARGV >= 1) {
         $working_mode="list";
         if (@ARGV >= 2 && $ARGV[1] ne "-f" && $ARGV[1] ne "--file") {
             $argument = decode_utf8($ARGV[1]);
-            if (@ARGV >= 3 && ($ARGV[1] eq "-f" || $ARGV[1] ne "--file")) {
+            if (@ARGV >= 3 && ($ARGV[2] eq "-f" || $ARGV[2] eq "--file")) {
                 if (@ARGV >= 4 && $ARGV[3] ne "") {
                     $file_name = decode_utf8($ARGV[3]);
                 } else {
@@ -93,7 +94,7 @@ if (@ARGV >= 1) {
                     exit 1;
                 }
             }
-        } elsif (@ARGV >= 2 && ($ARGV[1] eq "-f" || $ARGV[1] ne "--file")) {
+        } elsif (@ARGV >= 2 && ($ARGV[1] eq "-f" || $ARGV[1] eq "--file")) {
             if (@ARGV >= 3 && $ARGV[2] ne "") {
                 $file_name = decode_utf8($ARGV[2]);
             } else {
@@ -105,7 +106,7 @@ if (@ARGV >= 1) {
         $working_mode="pattern";
         if (@ARGV >= 2 && $ARGV[1] ne "-f" && $ARGV[1] ne "--file") {
             $argument = decode_utf8($ARGV[1]);
-            if (@ARGV >= 3 && ($ARGV[1] eq "-f" || $ARGV[1] ne "--file")) {
+            if (@ARGV >= 3 && ($ARGV[2] eq "-f" || $ARGV[2] eq "--file")) {
                 if (@ARGV >= 4 && $ARGV[3] ne "") {
                     $file_name = decode_utf8($ARGV[3]);
                 } else {
@@ -115,6 +116,28 @@ if (@ARGV >= 1) {
             }
         } else {
             print "Błąd: Brak patternu do wyszukania.\n";
+            exit 1;
+        }
+    } elsif ($mode eq "-e" || $mode eq "--edit") {
+        $working_mode="edit";
+        if (@ARGV >= 2 && $ARGV[1] ne "-f" && $ARGV[1] ne "--file") {
+            $argument = decode_utf8($ARGV[1]);
+            if (@ARGV >= 3 && $ARGV[2] ne "-f" && $ARGV[2] ne "--file") {
+                $data = decode_utf8($ARGV[2]);
+                if (@ARGV >= 4 && ($ARGV[3] eq "-f" || $ARGV[3] eq "--file")) {
+                    if (@ARGV >= 5 && $ARGV[4] ne "") {
+                        $file_name = decode_utf8($ARGV[4]);
+                    } else {
+                        print "Błąd: Brak nazwy pliku z danymi.\n";
+                        exit 1;
+                    }   
+                }
+            } else {
+                print "Błąd: Brak danych do edycji kontaktu.\n";
+                exit 1;
+            }
+        } else {
+            print "Błąd: Brak nazwy kontaktu do edycji.\n";
             exit 1;
         }
     } elsif ($mode eq "-f" || $mode eq "--file") {
@@ -140,6 +163,8 @@ if ($working_mode eq "add") {
     Logic::list_one($argument);
 } elsif ($working_mode eq "pattern") {
     Logic::find_contacts($argument);
+} elsif ($working_mode eq "edit") {
+    Logic::edit_contact($argument, $data);
 } else {
     Logic::list_all($argument);
 } 
@@ -170,6 +195,7 @@ sub show_help {
     print "\t-l, --list\tWyświetla listę kontaktów, przyjmuje jeden opcjonalny argument - liczbę kontaktów do wyświetlanie, domyślnie pokazuje wszystkie kontakty\n";
     print "\t-r, --remove\tUsuwa podany kontakt, przyjemuje jeden wymagany argument - jednoczłonową nazwę kontaktu do usunięcia\n";
     print "\t-p, --pattern\t\n";
+    print "\t-e, --edit\t\n";
     print "\n";
 
     print "FLAGI\n";
