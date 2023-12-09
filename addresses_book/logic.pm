@@ -2,7 +2,7 @@ package Logic;
 
 use Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(create_database, load_contacts, save_contacts, add_contact, remove_contact, list_one, find_contacts);
+our @EXPORT = qw(create_database, load_contacts, save_contacts, add_contact, remove_contact, list_one, find_contacts, edit_contact);
 use utf8;
 use open qw(:std :utf8);
 
@@ -116,6 +116,72 @@ sub add_contact {
     save_contacts(@saved_contacts);
 }
 
+sub edit_contact {
+    my $contact_name = @_[0];
+    my $contact_info = @_[1];
+    my @contact_infos = split(/\|/, $contact_info); 
+
+    @saved_contacts = load_contacts();
+    my $saved_contact;
+    my $contact_found = 0;
+
+    for my $contact (@saved_contacts) {
+        if ($contact->{name} eq $contact_name) {
+            $contact_found = 1;
+            $saved_contact = $contact;
+            last;
+        }
+    }
+
+    if (! $contact_found) {
+        print "Błąd: Kontakt '$contact_name' nie został znaleziony.\n";
+        exit 1;
+    }
+
+    if ($contact_infos[0] ne '-') {
+        if (defined $contact_infos[0]) {
+            for my $contact (@saved_contacts) {
+                if ($contact->{name} eq $contact_infos[0]) {
+                    print "Błąd: Kontakt o nazwie '$contact_infos[0]' już istnieje.\n";
+                    exit 1;
+                }
+            }
+            $saved_contact->{name} = $contact_infos[0];
+        } else {
+            $saved_contact->{name} = '';
+        }
+    }
+
+    if ($contact_infos[1] ne '-') {
+        if (defined $contact_infos[1]) {
+            $saved_contact->{description} = $contact_infos[1];
+        } else {
+            $saved_contact->{description} = '';
+        }
+    }
+
+    if ($contact_infos[2] ne '-') {
+        if (defined $contact_infos[2]) {
+            $saved_contact->{phone} = $contact_infos[2];
+        } else {
+            $saved_contact->{phone} = '';
+        }
+    }
+
+    if ($contact_infos[3] ne '-') {
+        if (defined $contact_infos[3]) {
+            $saved_contact->{email} = $contact_infos[3];
+        } else {
+            $saved_contact->{email} = '';
+        }
+    }
+
+    if ($saved_contact->{name} ne '' || $saved_contact->{phone} ne '' || $saved_contact->{email} ne '') {
+        validate_contact_data($saved_contact->{name}, $saved_contact->{phone}, $saved_contact->{email});
+        save_contacts(@saved_contacts);
+    }
+}
+
 sub remove_contact {
     my $contact_name = $_[0];
     my @saved_contacts = load_contacts();
@@ -193,7 +259,7 @@ sub find_contacts {
     my @found_contacts;
 
     for my $contact (@saved_contacts) {
-        if ($contact->{name} eq $pattern || $contact->{description} =~ /\Q$pattern\E/) {
+        if ($contact->{description} =~ /\Q$pattern\E/) {
             push @found_contacts, $contact;
         }
     }

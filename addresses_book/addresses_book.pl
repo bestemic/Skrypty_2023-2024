@@ -182,8 +182,11 @@ sub show_help {
     . "\tktóry znajduje się w tym samym folderze co skrypt. Możemy jednak ręcznie wskazywać na plik który przechowuje dane używająć flagi 'file' jako\n"
     . "\tprzedostatni argument wywołania skryptu i podająć po niej nazwę pliku. W momencie gdy plik nie zostanie znaleziony będzie on utworzony. Aby\n"
     . "\tusunąć kontakt z listy należy podać nazwę kontaktu do trybu 'remove'. Opcja 'search' pozwala na pobranie na podstawie podanej nazwy, kontaktu\n"
-    . "\tz bazy i wyświetlenie go. Opcja 'list' jest opcją domyślną i wyświetla wszystkie zapisane kontakty - domyślnie wypisywana jest cała książka\n"
-    . "\tadresowa, aby wyświetlić mniej wystarczy podać jako argument liczbę oznaczającą limit.\n";
+    . "\tz bazy i wyświetlenie go. Podobna opcja 'pattern' pozwala wyszukać kontaktów po fragmencie opisu. Skrypt pozwala też na modyfikację kontaktów\n"
+    . "\tużywająć opcji 'edit'. Aby zmodyfikować dowolną część kontaktu należy po opcji podać nazwę kontaktu do zmodyfikowania, a następnie \"dane\",\n"
+    . "\tgdzie dane to informacje oddzielone od siebie za pomocą \|. Wszystko podajemy analogicznie jak przy tworzeniu kontaktu z tą różnicą że gdy\n"
+    . "\tnie modyfikujemy danego pola to wstawiamy tam znak '-', czyli np. -|Opis|-|Email. Opcja 'list' jest opcją domyślną i wyświetla wszystkie zapisane\n"
+    . "\tkontakty - domyślnie wypisywana jest cała książka adresowa, aby wyświetlić mniej wystarczy podać jako argument liczbę oznaczającą limit.\n";
     print "\n";
 
     print "UŻYCIE\n";
@@ -194,8 +197,8 @@ sub show_help {
     print "\t-s, --search\tWyświtla podany kontakt, przyjemuje jeden wymagany argument - jednoczłonową nazwę kontaktu do wyświetlenia\n";
     print "\t-l, --list\tWyświetla listę kontaktów, przyjmuje jeden opcjonalny argument - liczbę kontaktów do wyświetlanie, domyślnie pokazuje wszystkie kontakty\n";
     print "\t-r, --remove\tUsuwa podany kontakt, przyjemuje jeden wymagany argument - jednoczłonową nazwę kontaktu do usunięcia\n";
-    print "\t-p, --pattern\t\n";
-    print "\t-e, --edit\t\n";
+    print "\t-p, --pattern\tWyszukuje kontakty według fragmenu opisu, przyjemuje jeden wymagany argument - fragment opisu do wyszukania\n";
+    print "\t-e, --edit\tModyfikuje kontakt, przyjmuje dwa wymagane argumenty - nazwę kontaktu i nowe dane w formacie opisanym wyżej\n";
     print "\n";
 
     print "FLAGI\n";
@@ -209,4 +212,5 @@ sub show_help {
     print"\t$0 -s Jan\n";
     print"\t$0 -r Jan -f nowa_baza.txt\n";
     print"\t$0 -p \"Lewa\"\n";
+    print"\t$0 -e alewa \"-|Anna|-|anna\@gmail.com\"\n";
 }
